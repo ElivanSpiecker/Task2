@@ -2,65 +2,47 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listagem de Tarefas</title>
+    <title>Bem-vindo ao Sistema de Tarefas</title>
     <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 10px;
+        body {
+            font-family: Arial, sans-serif;
             text-align: center;
+            padding: 100px;
+            background-color: #f9f9f9;
         }
-        th {
-            background-color: #f2f2f2;
+        h1 {
+            color: #333;
+        }
+        .menu {
+            margin-top: 40px;
+        }
+        .menu a {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 30px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+        .menu a.cadastrar {
+            background-color: #28a745;
+        }
+        .menu a:hover {
+            opacity: 0.9;
         }
     </style>
 </head>
 <body>
 
-<h1>Listagem de Tarefas</h1>
+<h1>Bem-vindo ao Sistema de Tarefas</h1>
+<p>Gerencie suas tarefas com praticidade.</p>
 
-<?php
-include 'conexao.php'; // Inclua a conexão com o banco de dados
-
-$sql = "SELECT idtarefa, descricao, data_criacao, data_prevista, data_encerramento, situacao FROM tarefa";
-$result = $conn->query($sql);
-
-if ($result->num_rows > 0) {
-    echo "<table>
-            <tr>
-                <th>ID</th>
-                <th>Descrição</th>
-                <th>Data de Criação</th>
-                <th>Data Prevista</th>
-                <th>Data de Encerramento</th>
-                <th>Situação</th>
-            </tr>";
-
-    while($row = $result->fetch_assoc()) {
-        echo "<tr>
-                <td>" . $row["idtarefa"] . "</td>
-                <td>" . $row["descricao"] . "</td>
-                <td>" . $row["data_criacao"] . "</td>
-                <td>" . $row["data_prevista"] . "</td>
-                <td>" . ($row["data_encerramento"] ? $row["data_encerramento"] : 'Não encerrada') . "</td>
-                <td>" . $row["situacao"] . "</td>
-              </tr>";
-    }
-
-    echo "</table>";
-} else {
-    echo "Nenhuma tarefa encontrada.";
-}
-
-$conn->close();
-?>
+<div class="menu">
+    <a href="login.php">Login</a>
+    <a href="cadastrar_usuario.php" class="cadastrar">Cadastrar Usuário</a>
+</div>
 
 </body>
 </html>
