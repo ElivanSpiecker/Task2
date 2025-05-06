@@ -8,7 +8,7 @@ class UsuarioTest extends TestCase {
     private $conn;
 
     protected function setUp(): void {
-        $this->conn = new mysqli("localhost", "root", "123", "task2");
+        $this->conn = new mysqli("localhost", "root", "123", "meu_banco");
     }
 
     public function testCadastrarUsuarioValido() {
