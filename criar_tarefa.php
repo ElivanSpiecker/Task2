@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <button type="submit">Criar Tarefa</button>
 </form>
 
-<p><a href="index.php">Voltar</a></p>
+<p><a href="listar_tarefa.php">Voltar</a></p>
 
 </body>
 </html>
