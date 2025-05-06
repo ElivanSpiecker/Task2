@@ -2,7 +2,7 @@
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/../conexao.php';
-require_once __DIR__ . '/../classes/Usuario.php';
+require_once __DIR__ . '/../classes/usuario.php';
 
 class UsuarioTest extends TestCase {
     private $conn;
