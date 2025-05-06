@@ -1,7 +1,7 @@
 <?php
 session_start();
 require 'conexao.php';
-require 'classes/Tarefa.php';
+require 'classes/tarefa.php';
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     echo "ID inválido.";
