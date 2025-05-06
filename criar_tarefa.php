@@ -1,7 +1,7 @@
 <?php
 session_start();
 require 'conexao.php';
-require 'classes/Tarefa.php';
+require 'classes/tarefa.php';
 require 'email.php';
 
 // Processar o formulário
