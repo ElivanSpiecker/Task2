@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'situacao' => $_POST['situacao']
     ];
     if (Tarefa::editar($conn, $id, $dados)) {
-        enviarEmail("destinatario@exemplo.com", "Tarefa Atualizada", "A tarefa '{$dados['descricao']}' foi atualizada.");
+        enviarEmail("eli.spiecker@gmail.com", "Tarefa Atualizada", "A tarefa '{$dados['descricao']}' foi atualizada.");
         header("Location: listar_tarefa.php");
         exit();
     } else {
