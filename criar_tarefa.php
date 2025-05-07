@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'situacao' => $_POST['situacao']
     ];
     if (Tarefa::criar($conn, $dados)) {
-        enviarEmail("destinatario@exemplo.com", "Nova Tarefa Criada", "A tarefa '{$dados['descricao']}' foi criada.");
+        enviarEmail("eli.spiecker@gmail.com", "Nova Tarefa Criada", "A tarefa '{$dados['descricao']}' foi criada.");
         header("Location: listar_tarefa.php");
         exit();
     } else {
