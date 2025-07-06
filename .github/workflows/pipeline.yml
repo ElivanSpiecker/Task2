@@ -8,6 +8,7 @@ on:
 env:
   FLYWAY_VER: 11.10.1
 
+
 jobs:
   homolog:
     name: 🔧 Homologação
