@@ -31,7 +31,7 @@ jobs:
       run: chmod +x ./vendor/bin/phpunit
 
     - name: 🧪 Rodar testes PHPUnit
-      run: ./vendor/bin/phpunit --testdox
+      run: ./vendor/bin/phpunit --testdox tests/
 
     - name: 🛠️ Criar flyway.conf para Homologação
       run: |
