@@ -3,7 +3,7 @@ name: Pipeline PHP com Flyway (Homolog + Produção)
 on:
   push:
     branches: [main]
-  workflow_dispatch:  
+  workflow_dispatch: # permite executar manualmente também
 
 jobs:
   homolog:
@@ -14,18 +14,26 @@ jobs:
     - name: 🔄 Checkout do código
       uses: actions/checkout@v3
 
-    - name: ⚙️ Instalar PHP e dependências
+    - name: ⚙️ Instalar PHP, Composer e dependências
       run: |
         sudo apt update
-        sudo apt install php php-mbstring php-xml php-mysql unzip sshpass default-jre -y
+        sudo apt install php php-mbstring php-xml php-mysql unzip sshpass default-jre mysql-client -y
         curl -sS https://getcomposer.org/installer | php
         php composer.phar install
 
-    - name: 🧪 Rodar testes PHPUnit
-      run: |
-        chmod +x ./vendor/bin/phpunit
-        ./vendor/bin/phpunit --testdox
+    - name: ☁️ Cache do Composer
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
 
+    - name: ✅ Garantir execução do PHPUnit
+      run: chmod +x ./vendor/bin/phpunit
+
+    - name: 🧪 Rodar testes PHPUnit
+      run: ./vendor/bin/phpunit --testdox
+           ./vendor/bin/phpunit tests/TarefaTest.php --testdox
+           ./vendor/bin/phpunit tests/UsuarioTest.php --testdox
 
     - name: 🛠️ Criar flyway.conf para Homologação
       run: |
@@ -40,14 +48,16 @@ jobs:
         tar -xvzf flyway-commandline-11.10.1-linux-x64.tar.gz
         ./flyway-11.10.1/flyway -configFiles=flyway.conf migrate
 
-    - name: 🚀 Deploy para /var/www/homolog via SCP
+    - name: 🚀 Deploy para /var/www/homolog via SCP (sem .env)
       run: |
-        sshpass -p "${{ secrets.SSH_PASS_HOMOLOG }}" scp -r -o StrictHostKeyChecking=no * ${{ secrets.SSH_USER_HOMOLOG }}@${{ secrets.SSH_HOST_HOMOLOG }}:/var/www/homolog
+        find . -type f ! -name ".env" | xargs tar -czf deploy.tar.gz
+        sshpass -p "${{ secrets.SSH_PASS_HOMOLOG }}" scp -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.SSH_USER_HOMOLOG }}@${{ secrets.SSH_HOST_HOMOLOG }}:/var/www/homolog
+        sshpass -p "${{ secrets.SSH_PASS_HOMOLOG }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER_HOMOLOG }}@${{ secrets.SSH_HOST_HOMOLOG }} "cd /var/www/homolog && tar -xzf deploy.tar.gz && rm deploy.tar.gz"
 
   producao:
     name: 🚀 Produção
     runs-on: ubuntu-latest
-    needs: homolog
+    needs: homolog # só executa se homolog passar
 
     steps:
     - name: 🔄 Checkout do código
@@ -66,6 +76,8 @@ jobs:
         tar -xvzf flyway-commandline-11.10.1-linux-x64.tar.gz
         ./flyway-11.10.1/flyway -configFiles=flyway.conf migrate
 
-    - name: 📦 Deploy para /var/www/producao via SCP
+    - name: 📦 Deploy para /var/www/producao via SCP (sem .env)
       run: |
-        sshpass -p "${{ secrets.SSH_PASS_PROD }}" scp -r -o StrictHostKeyChecking=no * ${{ secrets.SSH_USER_PROD }}@${{ secrets.SSH_HOST_PROD }}:/var/www/producao
+        find . -type f ! -name ".env" | xargs tar -czf deploy.tar.gz
+        sshpass -p "${{ secrets.SSH_PASS_PROD }}" scp -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.SSH_USER_PROD }}@${{ secrets.SSH_HOST_PROD }}:/var/www/producao
+        sshpass -p "${{ secrets.SSH_PASS_PROD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER_PROD }}@${{ secrets.SSH_HOST_PROD }} "cd /var/www/producao && tar -xzf deploy.tar.gz && rm deploy.tar.gz"
