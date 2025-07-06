@@ -10,26 +10,17 @@ jobs:
     name: 🔧 Homologação
     runs-on: ubuntu-latest
 
-    # expõe todos os secrets como env vars para o job e para o serviço
-    env:
-      DB_NAME_HOMOLOG: ${{ secrets.DB_NAME_HOMOLOG }}
-      DB_USER_HOMOLOG: ${{ secrets.DB_USER_HOMOLOG }}
-      DB_PASS_HOMOLOG: ${{ secrets.DB_PASS_HOMOLOG }}
-      DB_URL_HOMOLOG:  ${{ secrets.DB_URL_HOMOLOG }}
-      SSH_HOST_HOMOLOG: ${{ secrets.SSH_HOST_HOMOLOG }}
-      SSH_USER_HOMOLOG: ${{ secrets.SSH_USER_HOMOLOG }}
-      SSH_PASS_HOMOLOG: ${{ secrets.SSH_PASS_HOMOLOG }}
-
     services:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: ${{ env.DB_PASS_HOMOLOG }}
-          MYSQL_DATABASE:      ${{ env.DB_NAME_HOMOLOG }}
+          # TESTES LOCAIS: usuário root, senha 123, banco meu_banco_homolog
+          MYSQL_ROOT_PASSWORD: "123"
+          MYSQL_DATABASE:      "meu_banco_homolog"
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h localhost -uroot -p${{ env.DB_PASS_HOMOLOG }}"
+          --health-cmd="mysqladmin ping -h localhost -uroot -p123"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
@@ -59,9 +50,9 @@ jobs:
           cat <<EOF > .env
           DB_HOST=127.0.0.1
           DB_PORT=3306
-          DB_NAME=${DB_NAME_HOMOLOG}
-          DB_USER=${DB_USER_HOMOLOG}
-          DB_PASS=${DB_PASS_HOMOLOG}
+          DB_NAME=${{ secrets.DB_NAME_HOMOLOG }}
+          DB_USER=root
+          DB_PASS=${{ secrets.DB_PASS_HOMOLOG }}
           EOF
 
       - name: 🧪 Rodar testes PHPUnit
@@ -70,9 +61,9 @@ jobs:
       - name: 🛠️ Criar flyway.conf para Homologação
         run: |
           cat <<EOF > flyway.conf
-          flyway.url=${DB_URL_HOMOLOG}
-          flyway.user=${DB_USER_HOMOLOG}
-          flyway.password=${DB_PASS_HOMOLOG}
+          flyway.url=${{ secrets.DB_URL_HOMOLOG }}
+          flyway.user=${{ secrets.DB_USER_HOMOLOG }}
+          flyway.password=${{ secrets.DB_PASS_HOMOLOG }}
           flyway.locations=filesystem:./db/migrations
           EOF
 
@@ -82,28 +73,20 @@ jobs:
           tar -xzf flyway-commandline-11.10.1-linux-x64.tar.gz
           ./flyway-11.10.1/flyway -configFiles=flyway.conf migrate
 
-      - name: 🚀 Deploy para homolog
+      - name: 🚀 Deploy para homologação
         run: |
           find . -type f ! -name ".env" | xargs tar -czf deploy.tar.gz
-          sshpass -p "$SSH_PASS_HOMOLOG" \
+          sshpass -p "${{ secrets.SSH_PASS_HOMOLOG }}" \
             scp -o StrictHostKeyChecking=no deploy.tar.gz \
-            "$SSH_USER_HOMOLOG@$SSH_HOST_HOMOLOG:/var/www/homolog"
-          sshpass -p "$SSH_PASS_HOMOLOG" \
-            ssh -o StrictHostKeyChecking=no "$SSH_USER_HOMOLOG@$SSH_HOST_HOMOLOG" \
+            "${{ secrets.SSH_USER_HOMOLOG }}@${{ secrets.SSH_HOST_HOMOLOG }}:/var/www/homolog"
+          sshpass -p "${{ secrets.SSH_PASS_HOMOLOG }}" \
+            ssh -o StrictHostKeyChecking=no "${{ secrets.SSH_USER_HOMOLOG }}@${{ secrets.SSH_HOST_HOMOLOG }}" \
             "cd /var/www/homolog && tar -xzf deploy.tar.gz && rm deploy.tar.gz"
 
   producao:
     name: 🚀 Produção
     runs-on: ubuntu-latest
     needs: homolog
-
-    env:
-      DB_URL_PROD:      ${{ secrets.DB_URL_PROD }}
-      DB_USER_PROD:     ${{ secrets.DB_USER_PROD }}
-      DB_PASS_PROD:     ${{ secrets.DB_PASS_PROD }}
-      SSH_HOST_PROD:    ${{ secrets.SSH_HOST_PROD }}
-      SSH_USER_PROD:    ${{ secrets.SSH_USER_PROD }}
-      SSH_PASS_PROD:    ${{ secrets.SSH_PASS_PROD }}
 
     steps:
       - name: 🔄 Checkout do código
@@ -117,9 +100,9 @@ jobs:
       - name: 🛠️ Criar flyway.conf para Produção
         run: |
           cat <<EOF > flyway.conf
-          flyway.url=${DB_URL_PROD}
-          flyway.user=${DB_USER_PROD}
-          flyway.password=${DB_PASS_PROD}
+          flyway.url=${{ secrets.DB_URL_PROD }}
+          flyway.user=${{ secrets.DB_USER_PROD }}
+          flyway.password=${{ secrets.DB_PASS_PROD }}
           flyway.locations=filesystem:./db/migrations
           EOF
 
@@ -132,9 +115,9 @@ jobs:
       - name: 📦 Deploy para produção
         run: |
           find . -type f ! -name ".env" | xargs tar -czf deploy.tar.gz
-          sshpass -p "$SSH_PASS_PROD" \
+          sshpass -p "${{ secrets.SSH_PASS_PROD }}" \
             scp -o StrictHostKeyChecking=no deploy.tar.gz \
-            "$SSH_USER_PROD@$SSH_HOST_PROD:/var/www/producao"
-          sshpass -p "$SSH_PASS_PROD" \
-            ssh -o StrictHostKeyChecking=no "$SSH_USER_PROD@$SSH_HOST_PROD" \
+            "${{ secrets.SSH_USER_PROD }}@${{ secrets.SSH_HOST_PROD }}:/var/www/producao"
+          sshpass -p "${{ secrets.SSH_PASS_PROD }}" \
+            ssh -o StrictHostKeyChecking=no "${{ secrets.SSH_USER_PROD }}@${{ secrets.SSH_HOST_PROD }}" \
             "cd /var/www/producao && tar -xzf deploy.tar.gz && rm deploy.tar.gz"
