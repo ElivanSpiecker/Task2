@@ -32,8 +32,6 @@ jobs:
 
     - name: 🧪 Rodar testes PHPUnit
       run: ./vendor/bin/phpunit --testdox
-           ./vendor/bin/phpunit tests/TarefaTest.php --testdox
-           ./vendor/bin/phpunit tests/UsuarioTest.php --testdox
 
     - name: 🛠️ Criar flyway.conf para Homologação
       run: |
