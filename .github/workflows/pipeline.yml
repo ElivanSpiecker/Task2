@@ -16,8 +16,6 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: ${{ secrets.DB_NAME_HOMOLOG }}
-          MYSQL_USER: ${{ secrets.DB_USER_HOMOLOG }}
-          MYSQL_PASSWORD: ${{ secrets.DB_PASS_HOMOLOG }}
         ports:
           - 3306:3306
         options: >-
@@ -52,8 +50,8 @@ jobs:
           DB_HOST=127.0.0.1
           DB_PORT=3306
           DB_NAME=${{ secrets.DB_NAME_HOMOLOG }}
-          DB_USER=${{ secrets.DB_USER_HOMOLOG }}
-          DB_PASS=${{ secrets.DB_PASS_HOMOLOG }}
+          DB_USER=root
+          DB_PASS=root
           EOF
 
       - name: 🧪 Rodar testes PHPUnit
