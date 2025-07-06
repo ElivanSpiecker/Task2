@@ -3,6 +3,7 @@ name: Pipeline PHP com Flyway (Homolog + Produção)
 on:
   push:
     branches: [main]
+  workflow_dispatch:  
 
 jobs:
   homolog:
