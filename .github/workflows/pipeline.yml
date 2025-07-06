@@ -21,7 +21,10 @@ jobs:
         php composer.phar install
 
     - name: 🧪 Rodar testes PHPUnit
-      run: ./vendor/bin/phpunit --testdox
+      run: |
+        chmod +x ./vendor/bin/phpunit
+        ./vendor/bin/phpunit --testdox
+
 
     - name: 🛠️ Criar flyway.conf para Homologação
       run: |
