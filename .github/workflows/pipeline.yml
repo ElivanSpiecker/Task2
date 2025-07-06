@@ -56,15 +56,14 @@ jobs:
 
       - name: 📥 Instalar Flyway CLI
         run: |
-          FLYWAY_V=11.10.1
-          TAG=flyway-${FLYWAY_V}
+          FLYWAY_VER=11.10.1
           wget -qO flyway.tar.gz \
-            https://github.com/flyway/flyway/releases/download/${TAG}/flyway-commandline-${FLYWAY_V}-linux-x64.tar.gz
+            https://github.com/flyway/flyway/releases/download/flyway-${FLYWAY_VER}/flyway-commandline-${FLYWAY_VER}-linux-x64.tar.gz
           tar -xzf flyway.tar.gz
 
       - name: 🚧 Migrar esquema local (para testes)
         run: |
-          ./flyway-11.10.1/flyway \
+          ./flyway-${FLYWAY_VER}/flyway \
             -url="jdbc:mysql://127.0.0.1:3306/meu_banco_homolog?useSSL=false&allowPublicKeyRetrieval=true" \
             -user=root \
             -password=123 \
@@ -82,7 +81,7 @@ jobs:
           flyway.password=${{ secrets.DB_PASS_HOMOLOG }}
           flyway.locations=filesystem:./db/migrations
           EOF
-          ./flyway-11.10.1/flyway -configFiles=flyway.conf migrate
+          ./flyway-${FLYWAY_VER}/flyway -configFiles=flyway.conf migrate
 
       - name: 🚀 Deploy para homologação
         run: |
