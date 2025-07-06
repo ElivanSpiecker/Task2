@@ -8,8 +8,10 @@ class UsuarioTest extends TestCase {
     private $conn;
 
     protected function setUp(): void {
-        $this->conn = new mysqli("localhost", "root", "123", "meu_banco");
+        // conecta por TCP no container local, usando o nome exato do banco do pipeline
+        $this->conn = new mysqli("127.0.0.1", "root", "123", "meu_banco_homolog", 3306);
     }
+    
 
     public function testCadastrarUsuarioValido() {
         $nome = 'Usuário Teste';
