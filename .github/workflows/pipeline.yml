@@ -65,7 +65,7 @@ jobs:
       - name: 🚧 Migrar esquema local (para testes)
         run: |
           ./flyway-11.10.1/flyway \
-            -url=jdbc:mysql://127.0.0.1:3306/meu_banco_homolog?useSSL=false \
+            -url="jdbc:mysql://127.0.0.1:3306/meu_banco_homolog?useSSL=false&allowPublicKeyRetrieval=true" \
             -user=root \
             -password=123 \
             -locations=filesystem:./db/migrations \
