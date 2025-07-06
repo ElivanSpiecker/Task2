@@ -86,26 +86,26 @@ jobs:
           ./flyway-${FLYWAY_VER}/flyway -configFiles=flyway.conf migrate
 
       - name: 🚀 Deploy para homologação
-  run: |
-    find . -type f ! -name ".env" | xargs tar -czf deploy.tar.gz
+        run: |
+          find . -type f ! -name ".env" | xargs tar -czf deploy.tar.gz
 
-    # Testa antes de copiar
-    sshpass -p "${{ secrets.SSH_PASS_HOMOLOG }}" \
-      ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-      -p 22 ${{ secrets.SSH_USER_HOMOLOG }}@${{ secrets.SSH_HOST_HOMOLOG }} \
-      "echo 'Conexão SSH OK'"
+          # Testa antes de copiar
+          sshpass -p "${{ secrets.SSH_PASS_HOMOLOG }}" \
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            -p 22 ${{ secrets.SSH_USER_HOMOLOG }}@${{ secrets.SSH_HOST_HOMOLOG }} \
+            "echo 'Conexão SSH OK'"
 
-    # Se passou, faz o scp
-    sshpass -p "${{ secrets.SSH_PASS_HOMOLOG }}" \
-      scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-      -P 22 deploy.tar.gz \
-      ${{ secrets.SSH_USER_HOMOLOG }}@${{ secrets.SSH_HOST_HOMOLOG }}:/var/www/homolog
+          # Se passou, faz o scp
+          sshpass -p "${{ secrets.SSH_PASS_HOMOLOG }}" \
+            scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            -P 22 deploy.tar.gz \
+            ${{ secrets.SSH_USER_HOMOLOG }}@${{ secrets.SSH_HOST_HOMOLOG }}:/var/www/homolog
 
-    # Descompacta remotamente
-    sshpass -p "${{ secrets.SSH_PASS_HOMOLOG }}" \
-      ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-      -p 22 ${{ secrets.SSH_USER_HOMOLOG }}@${{ secrets.SSH_HOST_HOMOLOG }} \
-      "cd /var/www/homolog && tar -xzf deploy.tar.gz && rm deploy.tar.gz"
+          # Descompacta remotamente
+          sshpass -p "${{ secrets.SSH_PASS_HOMOLOG }}" \
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            -p 22 ${{ secrets.SSH_USER_HOMOLOG }}@${{ secrets.SSH_HOST_HOMOLOG }} \
+            "cd /var/www/homolog && tar -xzf deploy.tar.gz && rm deploy.tar.gz"
 
   producao:
     name: 🚀 Produção
