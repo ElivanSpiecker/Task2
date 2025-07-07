@@ -13,8 +13,3 @@ CREATE TABLE tarefa (
     data_encerramento DATE,
     situacao VARCHAR(20) NOT NULL
 );
-
-CREATE TABLE teste (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    descricao VARCHAR(255) NOT NULL
-);
