@@ -1,4 +1,4 @@
-name: Pipeline PHP com Flyway (Homolog + Produção)
+name: Pipeline Homolog
 
 on:
   push:
@@ -113,50 +113,4 @@ jobs:
             ${{ secrets.SSH_USER_HOMOLOG }}@${{ secrets.SSH_HOST_HOMOLOG }} \
             "cd /var/www/homolog && tar -xzf deploy.tar.gz && rm deploy.tar.gz"
 
-  producao:
-    name: 🚀 Produção
-    runs-on: ubuntu-latest
-    needs: homolog
-
-    steps:
-      - name: 🔄 Checkout do código
-        uses: actions/checkout@v3
-
-      - name: ⚙️ Instalar JRE e sshpass
-        run: |
-          sudo apt update
-          sudo apt install -y default-jre sshpass
-
-      - name: 🛠️ Criar flyway.conf para Produção
-        run: |
-          cat <<EOF > flyway.conf
-          flyway.url=${{ secrets.DB_URL_PROD }}
-          flyway.user=${{ secrets.DB_USER_PROD }}
-          flyway.password=${{ secrets.DB_PASS_PROD }}
-          flyway.locations=filesystem:./db/migrations
-          EOF
-
-      - name: 🗃️ Instalar Flyway CLI e migrar Produção
-        run: |
-          wget -qO flyway.tar.gz \
-            https://github.com/flyway/flyway/releases/download/flyway-${FLYWAY_VER}/flyway-commandline-${FLYWAY_VER}-linux-x64.tar.gz
-          tar -xzf flyway.tar.gz
-          ./flyway-${FLYWAY_VER}/flyway -configFiles=flyway.conf migrate
-
-      - name: 📦 Deploy para produção
-        run: |
-          find . -type f ! -name ".env" | xargs tar -czf deploy.tar.gz
-
-          sshpass -p "${{ secrets.SSH_PASS_PROD }}" \
-            scp -o StrictHostKeyChecking=no \
-                -o UserKnownHostsFile=/dev/null \
-                -P 22 \
-            deploy.tar.gz \
-            ${{ secrets.SSH_USER_PROD }}@${{ secrets.SSH_HOST_PROD }}:/var/www/producao
-
-          sshpass -p "${{ secrets.SSH_PASS_PROD }}" \
-            ssh -o StrictHostKeyChecking=no \
-                -o UserKnownHostsFile=/dev/null \
-                -p 22 \
-            ${{ secrets.SSH_USER_PROD }}@${{ secrets.SSH_HOST_PROD }} \
-            "cd /var/www/producao && tar -xzf deploy.tar.gz && rm deploy.tar.gz"
+  
