@@ -1,10 +1,10 @@
 name: Pipeline Produção
+
 on:
   workflow_dispatch:
 
 env:
   FLYWAY_VER: 11.10.1
-
 
 jobs:
 

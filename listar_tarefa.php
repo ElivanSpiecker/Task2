@@ -49,7 +49,7 @@
 </head>
 <body>
 
-<h1>Listagem de Tarefas</h1>
+<h1>Listagem de Tarefas FINAL</h1>
 
 <div class="top-bar">
     <a href="criar_tarefa.php" style="background-color: #28a745; color: white; padding: 8px 12px; border-radius: 4px; text-decoration: none;">+ Nova Tarefa</a>
